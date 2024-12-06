@@ -1,54 +1,91 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, Image, View } from 'react-native';
-import LoginScreen from './LoginScreen'; // Importamos la pantalla de Login
-import RegisterScreen from './RegisterScreen'; // Importamos la pantalla de Register
-import ExpensesScreen from './ExpensesScreen'; // Importamos la pantalla de Expenses
-import ForgotPasswordScreen from './ForgotPassword'; // Importamos la pantalla de recuperación de contraseña
+import { SafeAreaView, StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
+import LoginScreen from './LoginScreen';
+import RegisterScreen from './RegisterScreen';
+import ExpensesScreen from './ExpensesScreen';
+import CalculatorScreen from './CalculatorScreen';
+import FriendsScreen from './FriendsScreen';
+import AddFriendScreen from './AddFriendScreen';
+import TransactionsScreen from './TransactionsScreen';
+import CategoriesScreen from './CategoriesScreen';
+import ForgotPasswordScreen from './ForgotPassword';
 
 const Menu = () => {
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'login' | 'register' | 'expenses' | 'forgotPassword'>('home'); // Estado para controlar las pantallas
+  const [currentScreen, setCurrentScreen] = useState('home');
+
+  const changeScreen = (screen) => setCurrentScreen(screen);
+
+  const screenComponents = {
+    home: (
+      <View style={styles.homeContainer}>
+        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        <TouchableOpacity style={styles.loginButton} onPress={() => changeScreen('login')}>
+          <Text style={styles.loginText}>LOGIN</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signupButton} onPress={() => changeScreen('register')}>
+          <Text style={styles.signupText}>SIGN UP</Text>
+        </TouchableOpacity>
+      </View>
+    ),
+    login: (
+      <LoginScreen
+        onRegisterPress={() => changeScreen('register')}
+        onForgotPasswordPress={() => changeScreen('forgotPassword')}
+        onLoginPress={() => changeScreen('expenses')}
+      />
+    ),
+    register: <RegisterScreen onLoginPress={() => changeScreen('login')} />,
+    expenses: (
+      <ExpensesScreen
+        onFriendsPress={() => changeScreen('friends')}
+        onTransactionsPress={() => changeScreen('transactions')}
+        onCategoryPress={() => changeScreen('category')}
+      />
+    ),
+    calculator: (
+      <CalculatorScreen
+        onHomePress={() => changeScreen('expenses')}
+        onBackPress={() => changeScreen('expenses')}
+      />
+    ),
+    friends: (
+      <FriendsScreen 
+        onHomePress={() => changeScreen('expenses')}
+        onTransactionsPress={() => changeScreen('transactions')}
+        onCategoryPress={() => changeScreen('category')}
+        onAddFriendPress={() => changeScreen('addFriend')}
+      />
+    ),
+    transactions: (
+      <TransactionsScreen 
+        onHomePress={() => changeScreen('expenses')}
+        onFriendsPress={() => changeScreen('friends')}
+        onCategoryPress={() => changeScreen('category')}
+      />
+    ),
+    category: (
+      <CategoriesScreen 
+        friends={[
+          { id: '1', name: 'Carlos' },
+          { id: '2', name: 'Ana' },
+          { id: '3', name: 'Luis' }
+        ]}
+        onHomePress={() => changeScreen('expenses')}
+        onFriendsPress={() => changeScreen('friends')}
+        onTransactionsPress={() => changeScreen('transactions')}
+      />
+    ),
+    addFriend: (
+      <AddFriendScreen onBackPress={() => changeScreen('friends')} />
+    ),
+    forgotPassword: (
+      <ForgotPasswordScreen onBackPress={() => changeScreen('login')} />
+    ),
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Renderiza la pantalla según el estado `currentScreen` */}
-      {currentScreen === 'home' && (
-        <View style={styles.homeContainer}>
-          {/* Logo */}
-          <Image source={require('../assets/logo.png')} style={styles.logo} />
-
-          {/* Botón LOGIN */}
-          <TouchableOpacity style={styles.loginButton} onPress={() => setCurrentScreen('login')}>
-            <Text style={styles.loginText}>LOGIN</Text>
-          </TouchableOpacity>
-
-          {/* Botón SIGN UP */}
-          <TouchableOpacity style={styles.signupButton} onPress={() => setCurrentScreen('register')}>
-            <Text style={styles.signupText}>SIGN UP</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Pantalla de Login */}
-      {currentScreen === 'login' && (
-        <LoginScreen
-          onRegisterPress={() => setCurrentScreen('register')}
-          onForgotPasswordPress={() => setCurrentScreen('forgotPassword')} // Navegar a la pantalla de recuperación de contraseña
-          onLoginPress={() => setCurrentScreen('expenses')} // Al hacer login, cambia a la pantalla de Expenses
-        />
-      )}
-
-      {/* Pantalla de Registro */}
-      {currentScreen === 'register' && (
-        <RegisterScreen onLoginPress={() => setCurrentScreen('login')} />
-      )}
-
-      {/* Pantalla de Expenses */}
-      {currentScreen === 'expenses' && <ExpensesScreen />}
-
-      {/* Pantalla de recuperación de contraseña */}
-      {currentScreen === 'forgotPassword' && (
-        <ForgotPasswordScreen onBackPress={() => setCurrentScreen('login')} /> // Regresa a Login
-      )}
+      {screenComponents[currentScreen]}
     </SafeAreaView>
   );
 };

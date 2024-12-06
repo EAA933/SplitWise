@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import BottomMenu from './BottomMenu';
 
-const ExpensesScreen = () => {
+const ExpensesScreen = ({ onFriendsPress, onTransactionsPress, onCategoryPress }) => {
   const [user, setUser] = useState('Eduardo');
   const [balance, setBalance] = useState(2500.75);
   const [expenses, setExpenses] = useState([
@@ -11,9 +12,7 @@ const ExpensesScreen = () => {
     { id: '4', description: 'Netflix Subscription', amount: -15.0, date: '2024-10-18' },
   ]);
 
-  const formatCurrency = (amount) => {
-    return `$${amount.toFixed(2)}`;
-  };
+  const formatCurrency = (amount) => `$${amount.toFixed(2)}`;
 
   const renderExpense = ({ item }) => (
     <View style={styles.expenseItem}>
@@ -30,13 +29,27 @@ const ExpensesScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {user}</Text>
+        <View style={styles.userInfo}>
+          <Image source={require('../assets/usuario.png')} style={styles.userIcon} />
+          <Text style={styles.greetingText}>Hello, {user}</Text>
+        </View>
       </View>
 
       <View style={styles.balanceCard}>
         <Text style={styles.balanceTitle}>Total Balance</Text>
         <Text style={styles.balanceAmount}>{formatCurrency(balance)}</Text>
-        <Text style={styles.balanceSubtitle}>    Available balance for shared expenses     </Text>
+        <Text style={styles.balanceSubtitle}>Available balance for shared expenses</Text>
+      </View>
+
+      {/* Nuevo botón debajo de Overview */}
+      <View style={styles.customCard}>
+        <Text style={styles.customCardTitle}>Create Calculation</Text>
+        <Text style={styles.customCardDescription}>
+          Manage your shared expenses easily and keep track of your balance.
+        </Text>
+        <TouchableOpacity style={styles.customCardButton} onPress={() => alert('Create a new operation')}>
+          <Text style={styles.customCardButtonText}>Create a new operation</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.expensesContainer}>
@@ -49,32 +62,13 @@ const ExpensesScreen = () => {
         />
       </View>
 
-      <View style={styles.bottomMenu}>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/casa.png')} style={styles.icon} />
-          <Text style={styles.menuText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/usuario.png')} style={styles.icon} />
-          <Text style={styles.menuText}>User</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/calculadora.png')} style={styles.icon} />
-          <Text style={styles.menuText}>Calculator</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/transaccion.png')} style={styles.icon} />
-          <Text style={styles.menuText}>Transactions</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/categoria.png')} style={styles.icon} />
-          <Text style={styles.menuText}>Category</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <Image source={require('../assets/configuraciones.png')} style={styles.icon} />
-          <Text style={styles.menuText}>Settings</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomMenu
+        onHomePress={() => {}}
+        onFriendsPress={onFriendsPress}
+        onTransactionsPress={onTransactionsPress}
+        onCategoryPress={onCategoryPress}
+        activeScreen="home"
+      />
     </View>
   );
 };
@@ -85,22 +79,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    marginTop: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 20,
     paddingHorizontal: 20,
-    marginBottom: 20,
   },
-  greeting: {
-    fontSize: 26,
-    fontWeight: '600',
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#B0B0B0',
+    marginRight: 10,
+    tintColor: '#fff',
+  },
+  greetingText: {
+    fontSize: 20,
     color: '#333',
+    fontWeight: '500',
   },
   balanceCard: {
-    backgroundColor: '#4caf50',
+    backgroundColor: '#2ECC71',
     padding: 30,
     borderRadius: 20,
     alignItems: 'center',
     marginHorizontal: 20,
-    marginBottom: 30,
+    marginVertical: 20,
   },
   balanceTitle: {
     color: '#fff',
@@ -117,6 +125,38 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
   },
+  customCard: {
+    backgroundColor: '#E8F8F5',
+    padding: 20,
+    borderRadius: 12,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  customCardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2C3E50',
+    marginBottom: 10,
+  },
+  customCardDescription: {
+    fontSize: 14,
+    color: '#34495E',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  customCardButton: {
+    backgroundColor: '#1ABC9C',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+  },
+  customCardButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -129,7 +169,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   expenseItem: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f0f0f0',
     padding: 15,
     borderRadius: 12,
     flexDirection: 'row',
@@ -156,30 +196,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   negative: {
-    color: '#ff5252',
+    color: '#D9534F',
   },
   positive: {
-    color: '#4caf50',
-  },
-  bottomMenu: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    backgroundColor: '#fff',
-    borderTopColor: '#ddd',
-    borderTopWidth: 1,
-  },
-  menuItem: {
-    alignItems: 'center',
-  },
-  menuText: {
-    fontSize: 12,
-    color: '#333',
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    marginBottom: 5,
+    color: '#5CB85C',
   },
 });
 
